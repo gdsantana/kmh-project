@@ -1,0 +1,17 @@
+{
+  "baseline": "mt760-native-baseline.json",
+  "userAction": "Third physical DPI button press after baseline, restoring original stage",
+  "capturedAt": "2026-10-16T03:00:30.958239+00:00",
+  "device": "/dev/hidraw5",
+  "waitBeforeGetInputSeconds": 0.45,
+  "waitAfterResponseSeconds": 0.15,
+  "queries": [
+    {"name": "battery", "requestHex": "baa5aa0000000000000000000000000000000000000000000000000000000000", "responseBufferHex": "01013b0000000000000000000000000000000000000000000000000000000000", "returnedBytes": 3},
+    {"name": "dpi-list", "requestHex": "baa5a41838060000000000000000000000000000000000000000000000000000", "responseBufferHex": "01000000140018001b0010003000400050000200020002031000140000000000", "returnedBytes": 28},
+    {"name": "dpi-state", "requestHex": "baa5a41860060000000000000000000000000000000000000000000000000000", "responseBufferHex": "0100000050ff00ff070000000001020304050607000100010000000000000000", "returnedBytes": 28}
+  ],
+  "interpretation": {"activeZeroBasedIndex": 2, "activeDpi": 1350, "enabledStages": 3, "batteryPercent": 59},
+  "observedIndexSequence": [2, 0, 1, 2],
+  "originalStageRestored": true,
+  "allResponsesMatchBaseline": true
+}

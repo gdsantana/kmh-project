@@ -1,0 +1,35 @@
+{
+  "sourcePage": "https://www.rapoo.cn/downloadcenter?model=MT760",
+  "clientDate": "2026-10-15",
+  "redistributedBinaries": false,
+  "software": [
+    {
+      "name": "MT760LDriver",
+      "version": "1.0.5",
+      "url": "https://rpd.rapoo.cn/download/MT760LDriver_1.0.5_20241202.exe",
+      "mainName": "MT760LDriver.exe",
+      "archiveBlockOffset": 71972,
+      "installerBytes": 59344184,
+      "installerSha256": "0320e4bb409e1023f62c955d67da7fa1cc6dd35d69b27a131e947558220c84e4",
+      "mainBytes": 21449832,
+      "mainSha256": "b911e3397884078bb904e41fe60b34244a452c1ef71c2600106878bbfb113dd8",
+      "architecture": "PE32 / x86",
+      "framework": "Qt 5",
+      "execution": "not installed or executed; static analysis only"
+    },
+    {
+      "name": "RapooOfficeDevDriver",
+      "version": "1.2.1",
+      "url": "https://rpd.rapoo.cn/download/RapooOfficeDevDriver_Setup_1.2.1_20250422.exe",
+      "mainName": "RapooOfficeDev.exe",
+      "archiveBlockOffset": 41603,
+      "installerBytes": 36619768,
+      "installerSha256": "060950c71f46faa848707f3d0997fcdee1bacbd1dc22f4b389ec67061efa1854",
+      "mainBytes": 21649064,
+      "mainSha256": "4af207a5af13f860218df727619219df90420d4038ad3c3aa49db537235d84a7",
+      "architecture": "PE32 / x86",
+      "framework": "Qt 5",
+      "execution": "not installed or executed; static analysis only"
+    }
+  ]
+}

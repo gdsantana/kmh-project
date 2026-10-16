@@ -1,0 +1,541 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-10-16T02:28:04.441Z",
+  "exportedAt": "2026-10-16T02:28:14.731Z",
+  "source": "WebHID",
+  "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+  "secureContext": true,
+  "configurationCommandsSent": false,
+  "model": null,
+  "firmware": null,
+  "connectionMode": null,
+  "devices": [
+    {
+      "productName": "Rapoo Gaming Device",
+      "vendorId": 9390,
+      "productId": 6256,
+      "opened": false,
+      "error": "O navegador negou o acesso. Verifique a permissão do site e se a interface HID é protegida.",
+      "collections": [
+        {
+          "usagePage": 1,
+          "usage": 2,
+          "type": 1,
+          "inputReports": [],
+          "outputReports": [],
+          "featureReports": [],
+          "children": [
+            {
+              "usagePage": 1,
+              "usage": 1,
+              "type": 0,
+              "inputReports": [
+                {
+                  "reportId": 0,
+                  "bitLength": 56,
+                  "byteLength": 7,
+                  "items": [
+                    {
+                      "hasNull": false,
+                      "hasPreferredState": true,
+                      "isAbsolute": true,
+                      "isArray": false,
+                      "isBufferedBytes": false,
+                      "isConstant": false,
+                      "isLinear": true,
+                      "isRange": true,
+                      "isVolatile": false,
+                      "logicalMaximum": 1,
+                      "logicalMinimum": 0,
+                      "physicalMaximum": 0,
+                      "physicalMinimum": 0,
+                      "reportCount": 5,
+                      "reportSize": 1,
+                      "unitExponent": 0,
+                      "unitFactorCurrentExponent": 0,
+                      "unitFactorLengthExponent": 0,
+                      "unitFactorLuminousIntensityExponent": 0,
+                      "unitFactorMassExponent": 0,
+                      "unitFactorTemperatureExponent": 0,
+                      "unitFactorTimeExponent": 0,
+                      "unitSystem": "none",
+                      "usageMaximum": 589829,
+                      "usageMinimum": 589825,
+                      "wrap": false
+                    },
+                    {
+                      "hasNull": false,
+                      "hasPreferredState": true,
+                      "isAbsolute": true,
+                      "isArray": true,
+                      "isBufferedBytes": false,
+                      "isConstant": true,
+                      "isLinear": true,
+                      "isRange": false,
+                      "isVolatile": false,
+                      "logicalMaximum": 1,
+                      "logicalMinimum": 0,
+                      "physicalMaximum": 0,
+                      "physicalMinimum": 0,
+                      "reportCount": 1,
+                      "reportSize": 3,
+                      "unitExponent": 0,
+                      "unitFactorCurrentExponent": 0,
+                      "unitFactorLengthExponent": 0,
+                      "unitFactorLuminousIntensityExponent": 0,
+                      "unitFactorMassExponent": 0,
+                      "unitFactorTemperatureExponent": 0,
+                      "unitFactorTimeExponent": 0,
+                      "unitSystem": "none",
+                      "usages": [],
+                      "wrap": false
+                    },
+                    {
+                      "hasNull": false,
+                      "hasPreferredState": true,
+                      "isAbsolute": false,
+                      "isArray": false,
+                      "isBufferedBytes": false,
+                      "isConstant": false,
+                      "isLinear": true,
+                      "isRange": false,
+                      "isVolatile": false,
+                      "logicalMaximum": 32767,
+                      "logicalMinimum": -32768,
+                      "physicalMaximum": 0,
+                      "physicalMinimum": 0,
+                      "reportCount": 2,
+                      "reportSize": 16,
+                      "unitExponent": 0,
+                      "unitFactorCurrentExponent": 0,
+                      "unitFactorLengthExponent": 0,
+                      "unitFactorLuminousIntensityExponent": 0,
+                      "unitFactorMassExponent": 0,
+                      "unitFactorTemperatureExponent": 0,
+                      "unitFactorTimeExponent": 0,
+                      "unitSystem": "none",
+                      "usages": [
+                        65584,
+                        65585
+                      ],
+                      "wrap": false
+                    },
+                    {
+                      "hasNull": false,
+                      "hasPreferredState": true,
+                      "isAbsolute": false,
+                      "isArray": false,
+                      "isBufferedBytes": false,
+                      "isConstant": false,
+                      "isLinear": true,
+                      "isRange": false,
+                      "isVolatile": false,
+                      "logicalMaximum": 127,
+                      "logicalMinimum": -127,
+                      "physicalMaximum": 0,
+                      "physicalMinimum": 0,
+                      "reportCount": 1,
+                      "reportSize": 8,
+                      "unitExponent": 0,
+                      "unitFactorCurrentExponent": 0,
+                      "unitFactorLengthExponent": 0,
+                      "unitFactorLuminousIntensityExponent": 0,
+                      "unitFactorMassExponent": 0,
+                      "unitFactorTemperatureExponent": 0,
+                      "unitFactorTimeExponent": 0,
+                      "unitSystem": "none",
+                      "usages": [
+                        65592
+                      ],
+                      "wrap": false
+                    },
+                    {
+                      "hasNull": false,
+                      "hasPreferredState": true,
+                      "isAbsolute": false,
+                      "isArray": false,
+                      "isBufferedBytes": false,
+                      "isConstant": false,
+                      "isLinear": true,
+                      "isRange": false,
+                      "isVolatile": false,
+                      "logicalMaximum": 127,
+                      "logicalMinimum": -127,
+                      "physicalMaximum": 0,
+                      "physicalMinimum": 0,
+                      "reportCount": 1,
+                      "reportSize": 8,
+                      "unitExponent": 0,
+                      "unitFactorCurrentExponent": 0,
+                      "unitFactorLengthExponent": 0,
+                      "unitFactorLuminousIntensityExponent": 0,
+                      "unitFactorMassExponent": 0,
+                      "unitFactorTemperatureExponent": 0,
+                      "unitFactorTimeExponent": 0,
+                      "unitSystem": "none",
+                      "usages": [
+                        787000
+                      ],
+                      "wrap": false
+                    }
+                  ]
+                }
+              ],
+              "outputReports": [],
+              "featureReports": [],
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "productName": "Rapoo Gaming Device",
+      "vendorId": 9390,
+      "productId": 6256,
+      "opened": true,
+      "error": null,
+      "collections": [
+        {
+          "usagePage": 65281,
+          "usage": 0,
+          "type": 1,
+          "inputReports": [
+            {
+              "reportId": 6,
+              "bitLength": 224,
+              "byteLength": 28,
+              "items": [
+                {
+                  "hasNull": false,
+                  "hasPreferredState": true,
+                  "isAbsolute": true,
+                  "isArray": false,
+                  "isBufferedBytes": false,
+                  "isConstant": false,
+                  "isLinear": true,
+                  "isRange": true,
+                  "isVolatile": false,
+                  "logicalMaximum": 255,
+                  "logicalMinimum": 0,
+                  "physicalMaximum": 0,
+                  "physicalMinimum": 0,
+                  "reportCount": 28,
+                  "reportSize": 8,
+                  "unitExponent": 0,
+                  "unitFactorCurrentExponent": 0,
+                  "unitFactorLengthExponent": 0,
+                  "unitFactorLuminousIntensityExponent": 0,
+                  "unitFactorMassExponent": 0,
+                  "unitFactorTemperatureExponent": 0,
+                  "unitFactorTimeExponent": 0,
+                  "unitSystem": "none",
+                  "usageMaximum": 4278255871,
+                  "usageMinimum": 4278255617,
+                  "wrap": false
+                }
+              ]
+            }
+          ],
+          "outputReports": [
+            {
+              "reportId": 6,
+              "bitLength": 224,
+              "byteLength": 28,
+              "items": [
+                {
+                  "hasNull": false,
+                  "hasPreferredState": true,
+                  "isAbsolute": true,
+                  "isArray": false,
+                  "isBufferedBytes": false,
+                  "isConstant": false,
+                  "isLinear": true,
+                  "isRange": false,
+                  "isVolatile": false,
+                  "logicalMaximum": 255,
+                  "logicalMinimum": 0,
+                  "physicalMaximum": 0,
+                  "physicalMinimum": 0,
+                  "reportCount": 28,
+                  "reportSize": 8,
+                  "unitExponent": 0,
+                  "unitFactorCurrentExponent": 0,
+                  "unitFactorLengthExponent": 0,
+                  "unitFactorLuminousIntensityExponent": 0,
+                  "unitFactorMassExponent": 0,
+                  "unitFactorTemperatureExponent": 0,
+                  "unitFactorTimeExponent": 0,
+                  "unitSystem": "none",
+                  "usages": [
+                    4278255618
+                  ],
+                  "wrap": false
+                }
+              ]
+            }
+          ],
+          "featureReports": [
+            {
+              "reportId": 6,
+              "bitLength": 224,
+              "byteLength": 28,
+              "items": [
+                {
+                  "hasNull": false,
+                  "hasPreferredState": true,
+                  "isAbsolute": true,
+                  "isArray": false,
+                  "isBufferedBytes": false,
+                  "isConstant": false,
+                  "isLinear": true,
+                  "isRange": false,
+                  "isVolatile": false,
+                  "logicalMaximum": 255,
+                  "logicalMinimum": 0,
+                  "physicalMaximum": 0,
+                  "physicalMinimum": 0,
+                  "reportCount": 28,
+                  "reportSize": 8,
+                  "unitExponent": 0,
+                  "unitFactorCurrentExponent": 0,
+                  "unitFactorLengthExponent": 0,
+                  "unitFactorLuminousIntensityExponent": 0,
+                  "unitFactorMassExponent": 0,
+                  "unitFactorTemperatureExponent": 0,
+                  "unitFactorTimeExponent": 0,
+                  "unitSystem": "none",
+                  "usages": [
+                    4278255620
+                  ],
+                  "wrap": false
+                }
+              ]
+            }
+          ],
+          "children": []
+        }
+      ]
+    },
+    {
+      "productName": "Rapoo Gaming Device",
+      "vendorId": 9390,
+      "productId": 6256,
+      "opened": false,
+      "error": "O navegador negou o acesso. Verifique a permissão do site e se a interface HID é protegida.",
+      "collections": [
+        {
+          "usagePage": 12,
+          "usage": 1,
+          "type": 1,
+          "inputReports": [
+            {
+              "reportId": 3,
+              "bitLength": 16,
+              "byteLength": 2,
+              "items": [
+                {
+                  "hasNull": false,
+                  "hasPreferredState": true,
+                  "isAbsolute": true,
+                  "isArray": true,
+                  "isBufferedBytes": false,
+                  "isConstant": false,
+                  "isLinear": true,
+                  "isRange": true,
+                  "isVolatile": false,
+                  "logicalMaximum": 896,
+                  "logicalMinimum": 0,
+                  "physicalMaximum": 0,
+                  "physicalMinimum": 0,
+                  "reportCount": 1,
+                  "reportSize": 16,
+                  "unitExponent": 0,
+                  "unitFactorCurrentExponent": 0,
+                  "unitFactorLengthExponent": 0,
+                  "unitFactorLuminousIntensityExponent": 0,
+                  "unitFactorMassExponent": 0,
+                  "unitFactorTemperatureExponent": 0,
+                  "unitFactorTimeExponent": 0,
+                  "unitSystem": "none",
+                  "usageMaximum": 787328,
+                  "usageMinimum": 786432,
+                  "wrap": false
+                }
+              ]
+            }
+          ],
+          "outputReports": [],
+          "featureReports": [],
+          "children": []
+        },
+        {
+          "usagePage": 65280,
+          "usage": 14,
+          "type": 1,
+          "inputReports": [
+            {
+              "reportId": 186,
+              "bitLength": 248,
+              "byteLength": 31,
+              "items": [
+                {
+                  "hasNull": false,
+                  "hasPreferredState": true,
+                  "isAbsolute": true,
+                  "isArray": true,
+                  "isBufferedBytes": false,
+                  "isConstant": false,
+                  "isLinear": true,
+                  "isRange": false,
+                  "isVolatile": false,
+                  "logicalMaximum": 255,
+                  "logicalMinimum": 0,
+                  "physicalMaximum": 0,
+                  "physicalMinimum": 0,
+                  "reportCount": 31,
+                  "reportSize": 8,
+                  "unitExponent": 0,
+                  "unitFactorCurrentExponent": 0,
+                  "unitFactorLengthExponent": 0,
+                  "unitFactorLuminousIntensityExponent": 0,
+                  "unitFactorMassExponent": 0,
+                  "unitFactorTemperatureExponent": 0,
+                  "unitFactorTimeExponent": 0,
+                  "unitSystem": "none",
+                  "usages": [
+                    4278190081
+                  ],
+                  "wrap": false
+                }
+              ]
+            }
+          ],
+          "outputReports": [
+            {
+              "reportId": 186,
+              "bitLength": 248,
+              "byteLength": 31,
+              "items": [
+                {
+                  "hasNull": false,
+                  "hasPreferredState": true,
+                  "isAbsolute": true,
+                  "isArray": true,
+                  "isBufferedBytes": false,
+                  "isConstant": false,
+                  "isLinear": true,
+                  "isRange": false,
+                  "isVolatile": false,
+                  "logicalMaximum": 255,
+                  "logicalMinimum": 0,
+                  "physicalMaximum": 0,
+                  "physicalMinimum": 0,
+                  "reportCount": 31,
+                  "reportSize": 8,
+                  "unitExponent": 0,
+                  "unitFactorCurrentExponent": 0,
+                  "unitFactorLengthExponent": 0,
+                  "unitFactorLuminousIntensityExponent": 0,
+                  "unitFactorMassExponent": 0,
+                  "unitFactorTemperatureExponent": 0,
+                  "unitFactorTimeExponent": 0,
+                  "unitSystem": "none",
+                  "usages": [
+                    4278190081
+                  ],
+                  "wrap": false
+                }
+              ]
+            }
+          ],
+          "featureReports": [],
+          "children": []
+        },
+        {
+          "usagePage": 65280,
+          "usage": 2,
+          "type": 1,
+          "inputReports": [
+            {
+              "reportId": 187,
+              "bitLength": 48,
+              "byteLength": 6,
+              "items": [
+                {
+                  "hasNull": false,
+                  "hasPreferredState": true,
+                  "isAbsolute": true,
+                  "isArray": true,
+                  "isBufferedBytes": false,
+                  "isConstant": false,
+                  "isLinear": true,
+                  "isRange": false,
+                  "isVolatile": false,
+                  "logicalMaximum": 255,
+                  "logicalMinimum": 0,
+                  "physicalMaximum": 0,
+                  "physicalMinimum": 0,
+                  "reportCount": 6,
+                  "reportSize": 8,
+                  "unitExponent": 0,
+                  "unitFactorCurrentExponent": 0,
+                  "unitFactorLengthExponent": 0,
+                  "unitFactorLuminousIntensityExponent": 0,
+                  "unitFactorMassExponent": 0,
+                  "unitFactorTemperatureExponent": 0,
+                  "unitFactorTimeExponent": 0,
+                  "unitSystem": "none",
+                  "usages": [
+                    4278190082
+                  ],
+                  "wrap": false
+                }
+              ]
+            }
+          ],
+          "outputReports": [
+            {
+              "reportId": 187,
+              "bitLength": 48,
+              "byteLength": 6,
+              "items": [
+                {
+                  "hasNull": false,
+                  "hasPreferredState": true,
+                  "isAbsolute": true,
+                  "isArray": true,
+                  "isBufferedBytes": false,
+                  "isConstant": false,
+                  "isLinear": true,
+                  "isRange": false,
+                  "isVolatile": false,
+                  "logicalMaximum": 255,
+                  "logicalMinimum": 0,
+                  "physicalMaximum": 0,
+                  "physicalMinimum": 0,
+                  "reportCount": 6,
+                  "reportSize": 8,
+                  "unitExponent": 0,
+                  "unitFactorCurrentExponent": 0,
+                  "unitFactorLengthExponent": 0,
+                  "unitFactorLuminousIntensityExponent": 0,
+                  "unitFactorMassExponent": 0,
+                  "unitFactorTemperatureExponent": 0,
+                  "unitFactorTimeExponent": 0,
+                  "unitSystem": "none",
+                  "usages": [
+                    4278190082
+                  ],
+                  "wrap": false
+                }
+              ]
+            }
+          ],
+          "featureReports": [],
+          "children": []
+        }
+      ]
+    }
+  ]
+}

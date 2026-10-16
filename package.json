@@ -1,0 +1,23 @@
+{
+  "name": "rappo-mouse",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "bridge": "python3 apps/bridge/server.py",
+    "dev": "npm run dev -w @rapoo/web",
+    "build": "tsc --noEmit && npm run build -w @rapoo/web",
+    "test": "node --experimental-strip-types --test tests/*.test.ts && python3 tests/bridge_test.py"
+  },
+  "devDependencies": {
+    "typescript": "7.0.2",
+    "@types/w3c-web-hid": "1.0.7",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@types/node": "^24.0.0"
+  }
+}

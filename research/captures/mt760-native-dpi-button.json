@@ -1,0 +1,13 @@
+{
+  "baseline": "mt760-native-baseline.json",
+  "userAction": "One physical DPI button press after baseline",
+  "capturedAt": "2026-10-16T02:57:50.907971+00:00",
+  "device": "/dev/hidraw5",
+  "queries": [
+    {"name": "battery", "requestHex": "baa5aa0000000000000000000000000000000000000000000000000000000000", "responseBufferHex": "01013b0000000000000000000000000000000000000000000000000000000000", "returnedBytes": 3},
+    {"name": "dpi-list", "requestHex": "baa5a41838060000000000000000000000000000000000000000000000000000", "responseBufferHex": "01000000140018001b0010003000400050000200000002031000140000000000", "returnedBytes": 28},
+    {"name": "dpi-state", "requestHex": "baa5a41860060000000000000000000000000000000000000000000000000000", "responseBufferHex": "0100000050ff00ff070000000001020304050607000100010000000000000000", "returnedBytes": 28}
+  ],
+  "difference": {"query": "dpi-list", "zeroBasedByteOffset": 20, "before": 2, "after": 0},
+  "hypothesis": "Byte 20 is the active zero-based DPI index; needs another physical transition"
+}

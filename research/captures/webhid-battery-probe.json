@@ -1,0 +1,19 @@
+{
+  "source": "WebHID",
+  "requestedAt": "2026-10-16T03:08:36.147Z",
+  "vendorId": 9390,
+  "productId": 6256,
+  "usagePage": 65280,
+  "usage": 14,
+  "requestHex": "baa5aa0000000000000000000000000000000000000000000000000000000000",
+  "observationWindowMs": 3000,
+  "reports": [],
+  "error": null,
+  "nativeFollowUp": {
+    "operation": "HIDIOCGINPUT(32) only; no additional Output Report sent",
+    "device": "/dev/hidraw5",
+    "returnedBytes": 3,
+    "responseBufferHex": "01013b0000000000000000000000000000000000000000000000000000000000"
+  },
+  "conclusion": "Output completed in WebHID without a BA inputreport event during the observation window. Native GET_REPORT(Input) retrieved a battery response afterward. This observation is limited to this receiver/firmware."
+}

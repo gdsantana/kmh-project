@@ -1,0 +1,14 @@
+{
+  "capturedAt": "2026-10-16T02:59:55.235323+00:00",
+  "device": "/dev/hidraw5",
+  "valid": false,
+  "waitBeforeGetInputSeconds": 0.15,
+  "queries": [
+    {"name": "battery", "responseBufferHex": "0200000000000000000000000000000000000000000000000000000000000000", "returnedBytes": 1},
+    {"name": "dpi-list", "responseBufferHex": "0200000000000000000000000000000000000000000000000000000000000000", "returnedBytes": 1},
+    {"name": "dpi-state", "responseBufferHex": "01013b0000000000000000000000000000000000000000000000000000000000", "returnedBytes": 3}
+  ],
+  "interpretation": null,
+  "reason": "Two error responses followed by a delayed battery-shaped response during another query. No DPI restoration inferred from this attempt.",
+  "followUp": "Diagnostic now rejects incompatible status/length and stops before another query; waits increased to 450 ms before GET_INPUT and 150 ms after success. Next capture restored baseline exactly. Timing cause remains unproven."
+}
