@@ -1,12 +1,29 @@
-# Rapoo MT760 · WebHID inspector
+# KMH Project
 
-PoC local, somente leitura, para inspecionar interfaces WebHID e receber bateria/DPI por uma ponte Python Linux. React + TypeScript + Vite em um workspace npm. Sem conta, serviço externo ou comandos de gravação de configuração.
+**Keyboard · Mouse · Headphone**
+
+Projeto independente para investigar protocolos e desenvolver ferramentas locais de leitura e configuração de **teclados, mouses e fones de ouvido/headsets**. O suporte a cada dispositivo será baseado em descritores, capturas e testes físicos, com compatibilidade documentada.
+
+A implementação atual é uma PoC de leitura do **mouse Rapoo MT760 via receptor 2,4 GHz**: inspeção WebHID e bateria/DPI recebidos no navegador por uma ponte Python Linux. Teclados e fones de ouvido fazem parte do escopo de evolução e ainda não possuem suporte implementado. A interface atual continua dedicada ao experimento MT760.
+
+React + TypeScript + Vite em um workspace npm. Sem conta, serviço externo ou comandos de gravação de configuração implementados.
+
+Repositório: [gdsantana/kmh-project](https://github.com/gdsantana/kmh-project). O nome anterior era `rappo-mouse`.
 
 **Para continuar em outra sessão:** leia o [registro de retomada de bateria e DPI](docs/retomada-dpi-bateria.md), com o processo de descoberta, execução, arquivos relevantes, evidências e pendências.
 
 ## Executar
 
 Node.js **22.18+**, ou uma versão mais recente compatível com o Vite 8, e npm. Validado neste ambiente com Node 26.5.0 e npm 11.17.0.
+
+Para uma nova cópia:
+
+```sh
+git clone git@github.com:gdsantana/kmh-project.git
+cd kmh-project
+```
+
+Na pasta do projeto:
 
 ```sh
 npm ci
@@ -65,6 +82,7 @@ O preview fica em http://127.0.0.1:4173/. Testes usam descritores sintéticos e 
 ## Estrutura
 
 - `apps/web`: interface e fluxo do experimento.
+- `apps/bridge`: ponte Linux local para as leituras de bateria e DPI do MT760.
 - `packages/core`: modelo de evidência e resumos dos descritores.
 - `packages/transport-webhid`: descoberta, abertura, inspeção e fechamento.
 - `packages/device-definitions`: identidade observada, sem alegar compatibilidade de protocolo.
@@ -73,7 +91,7 @@ O preview fica em http://127.0.0.1:4173/. Testes usam descritores sintéticos e 
 - `docs`: arquitetura, compatibilidade, protocolo e histórico.
 - `tests`: testes do transporte e transformação dos descritores.
 
-Há um diagnóstico nativo reutilizado pela ponte local de leitura. Objetivos e limites completos: [HANDOFF.MD](HANDOFF.MD).
+Há um diagnóstico nativo reutilizado pela ponte local de leitura. O [HANDOFF.MD](HANDOFF.MD) original preserva os objetivos da pesquisa inicial do MT760; o escopo geral do KMH Project agora inclui teclado, mouse e fones de ouvido. A pesquisa e as capturas específicas do Rapoo permanecem identificadas pelo dispositivo de origem.
 
 ## Resultado verificado
 
