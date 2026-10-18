@@ -1,6 +1,8 @@
 # Retomada do projeto: leitura de bateria e DPI do MT760
 
-Registro de continuidade em **2026-10-16**, horário de referência America/Sao_Paulo.
+Registro de continuidade em **2026-10-16**, atualizado em **2026-10-17**, horário de referência America/Sao_Paulo.
+
+Atualização de 2026-10-17: o painel também lê o **polling rate configurado**, usando A4/0x630, byte wireless no offset 5. Foram obtidos 1000 Hz e o usuário confirmou esse valor na página. [Descoberta, captura e limites](../research/software-analysis/polling-rate.md). As capturas de 59%/1350 DPI abaixo são o histórico inicial; a captura posterior da ponte trouxe 54%/1350 DPI/1000 Hz.
 
 ## Estado alcançado
 
@@ -13,7 +15,7 @@ Na última captura preservada, a página mostrou **59% de bateria, 1350 DPI e es
 - Firmware: desconhecido. O identificador USB `20220811` não foi confirmado como versão de firmware.
 - Coleção usada na leitura: usage page `0xFF00`, usage `0x0E`, report ID `0xBA`, payload de 31 bytes.
 - Interface Linux no teste: `/dev/hidraw5`; reencontrar após reconectar, pois o número pode mudar.
-- Gravação de DPI/configurações, pareamento e atualização de firmware: não implementados.
+- A leitura inicial abaixo foi ampliada por um experimento supervisionado de gravação de um estágio DPI, documentado em [write-dpi.md](../research/experiments/write-dpi.md). Pareamento e atualização de firmware continuam não implementados.
 
 O [HANDOFF original](../HANDOFF.MD) contém os objetivos de longo prazo. Este documento registra o estado implementado para retomar sem depender do histórico do chat.
 
@@ -86,7 +88,7 @@ Em outro:
 npm run dev
 ```
 
-Abrir **http://127.0.0.1:5174/** e clicar **Ler bateria e DPI**. Não é necessário selecionar o dispositivo pelo WebHID para usar a ponte. A atualização é manual, sem polling. **Exportar leitura JSON** guarda valores e respostas brutas. Não depender de processos que tenham ficado abertos em uma sessão anterior.
+Abrir **http://127.0.0.1:5174/** e clicar **Ler informações do mouse**. Não é necessário selecionar o dispositivo pelo WebHID para usar a ponte. A atualização é manual, sem polling. **Exportar leitura JSON** guarda valores e respostas brutas. Não depender de processos que tenham ficado abertos em uma sessão anterior.
 
 ## Fluxo e arquivos para continuar
 
@@ -111,7 +113,7 @@ apps/web/src/main.tsx
 | [local-reader.test.ts](../tests/local-reader.test.ts) | Validação e falhas do cliente |
 | [webhid-probe.test.ts](../tests/webhid-probe.test.ts) | Consulta fixa e observação de eventos |
 
-A ponte escuta apenas em `127.0.0.1:5175`, valida Host/Origin, exige POST com `X-Rapoo-Read: 1` e não aceita corpo nem comandos arbitrários. Aceita as origens locais nas portas 5174 e 4173. Serializa as leituras e limita cada subprocesso a oito segundos; o cliente HTTP espera até vinte segundos. O caminho da ponte lê somente bateria e bloco DPI. A interface fecha os handles WebHID antes da leitura nativa.
+A ponte escuta apenas em `127.0.0.1:5175`, valida Host/Origin, exige POST com `X-Rapoo-Read: 1` e não aceita corpo nem comandos arbitrários. Aceita as origens locais nas portas 5174 e 4173. Serializa as leituras e limita cada subprocesso a oito segundos; o cliente HTTP espera até trinta segundos. O caminho da ponte lê somente bateria, bloco DPI e bloco de polling rate, conferindo a região comum dos dois blocos A4. A interface fecha os handles WebHID antes da leitura nativa.
 
 ## Evidências preservadas
 
@@ -146,7 +148,7 @@ Os testes automatizados usam mocks e capturas preservadas; não substituem nova 
 2. Investigar correlação de transações. Sem identificador conhecido, uma resposta antiga de mesmo tamanho produzida por outro cliente HID pode ser aceita. O lock protege apenas os pedidos desta ponte; manter um único leitor HID ativo.
 3. Comparar bateria e DPI com o software oficial e registrar firmware, sem Apply, pareamento ou atualização. O teste físico confirmou o seletor DPI, não a calibração de deslocamento por polegada nem a precisão do percentual.
 4. Validar carregamento e outros firmwares/modelos/conexões antes de ampliar a compatibilidade.
-5. Só depois de estabilizar a leitura, avaliar gravação de uma configuração com evidência própria, estado anterior registrado e restauração verificável. Nenhuma operação de escrita de configuração está comprovada neste trabalho.
+5. Evoluir o primeiro experimento de escrita para uma configuração utilizável: a tabela DPI já foi alterada, persistiu após ciclo físico do conjunto e foi restaurada. Ver [procedimento e evidência](../research/experiments/write-dpi.md). Antes de expor escrita na UI, resolver concorrência, correlação de respostas e a recuperação diante de desconexão durante gravação.
 
 Não adicionar polling automático ou promover o diagnóstico a transporte de produção antes de resolver o comportamento de respostas atrasadas. WebHID puro não recebeu resposta no teste atual; não apresentar a ponte como suporte WebHID direto.
 

@@ -1,8 +1,8 @@
 # Estado do protocolo
 
-**Nenhum comando de configuração confirmado.**
+**Gravação experimental da tabela DPI, persistência após ciclo de energia e restauração confirmadas neste conjunto mouse/receptor.**
 
-Os descritores abaixo indicam formatos anunciados pelo dispositivo, não o significado dos bytes nem a disponibilidade de DPI, bateria ou memória interna. Não há replay, handshake, leitura de feature ou escrita nesta PoC.
+Os descritores abaixo indicam formatos anunciados pelo dispositivo, não o significado dos bytes nem a disponibilidade de DPI, bateria ou memória interna. O inspetor web não realiza escrita de configuração nem leitura de Feature; a escrita experimental isolada é descrita ao final deste documento.
 
 Dispositivo observado: VID `0x24AE`, PID `0x1870`, nome USB `Rapoo Gaming Device`. O usuário confirmou modelo MT760 via receptor 2,4 GHz; firmware desconhecido. `bcdDevice=0.00` e o identificador USB não comprovam versão de firmware.
 
@@ -29,4 +29,16 @@ A análise estática do driver oficial **1.2.1** identificou `FDeviceMT760_Wirel
 
 GET_REPORT(Input) não tem equivalente direto no WebHID. Em 2026-10-16, abrimos `FF00/0E`, enviamos a consulta de bateria pelo navegador e não recebemos evento BA em três segundos; um GET_INPUT nativo posterior retornou a bateria sem novo Output Report. A ponte local agora entrega bateria/DPI reais à página. Evidências e execução em [integração no navegador](../research/experiments/browser-telemetry.md).
 
-Detalhes, limites, hashes e VAs reproduzíveis: [pesquisa DPI/bateria](../research/software-analysis/dpi-battery.md). A aplicação possui o teste fixo WebHID e acesso à ponte de leitura; nenhuma gravação de configuração foi adicionada.
+Detalhes, limites, hashes e VAs reproduzíveis: [pesquisa DPI/bateria](../research/software-analysis/dpi-battery.md). A aplicação possui o teste fixo WebHID e acesso à ponte de leitura; nenhuma gravação de configuração foi adicionada à API HTTP ou ao painel.
+
+## Polling rate configurado
+
+Leitura A4, comprimento 0x18, registro 0x630, report BA. Na variante MT760 wireless, o byte 5 da resposta indica código 8/4/2/1, correspondente a 125/250/500/1000 Hz. O byte 4 é utilizado pela classe comum e não foi usado como taxa wireless. O receptor retornou código 1 em duas leituras idênticas, com sobreposição coerente com o bloco DPI. A ponte entrega 1000 Hz e o usuário confirmou a apresentação na página. Códigos desconhecidos permanecem sem frequência associada; a região comum dos blocos é conferida antes da interpretação.
+
+É leitura de configuração, sem alteração ou medição física da taxa. [Rotinas, pacote e capturas](../research/software-analysis/polling-rate.md).
+
+## Escrita experimental da tabela DPI
+
+O setter herdado pelo MT760 wireless em 0x0051E9D0 usa A5, comprimento 16, registro 0x638, report BA. O experimento supervisionado gravou 1000→1050 DPI no primeiro estágio inativo, preservando os demais valores, o estágio ativo e os campos de polling observados. ACK 01 e leituras posteriores confirmaram a alteração. Depois do usuário desligar o mouse e retirar/reconectar o receptor, leituras estáveis ainda mostraram 1050 DPI, sem reenvio da gravação. A restauração para 1000 DPI foi enviada uma vez e confirmada por leitura. Isso demonstra persistência no conjunto; a localização física do armazenamento e um novo ciclo após restaurar não foram verificados.
+
+A ponte e a UI continuam somente de leitura. [Pacote, evidência e resultado atualizado](../research/experiments/write-dpi.md).

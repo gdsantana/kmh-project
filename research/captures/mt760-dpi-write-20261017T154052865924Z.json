@@ -1,0 +1,157 @@
+{
+  "kind": "mt760-inactive-dpi-test-v1",
+  "createdAt": "2026-10-17T15:40:48.947687+00:00",
+  "descriptorSha256": "d6316567a9545dd700ac3d5f2d2d23ff408e2ee1125c5ea385a7dae38aa34738",
+  "before": {
+    "source": "linux-hidraw",
+    "experimental": true,
+    "vendorId": 9390,
+    "productId": 6256,
+    "capturedAt": "2026-10-17T15:40:52.865825+00:00",
+    "batteryPercent": 56,
+    "dpiValues": [
+      1000,
+      1200,
+      1350,
+      800,
+      2400,
+      3200,
+      4000
+    ],
+    "enabledStages": 3,
+    "activeIndex": 2,
+    "activeDpi": 1350,
+    "pollingRateCode": 1,
+    "pollingRateHz": 1000,
+    "rawResponses": {
+      "battery": "010138",
+      "dpi-list": "01000000140018001b00100030004000500002000200020310001400",
+      "polling-rate": "010000000201ffff01020003140018001b0010003000400050000200"
+    }
+  },
+  "events": [
+    {
+      "startedAt": "2026-10-17T15:41:10.127341+00:00",
+      "operation": "apply-test",
+      "requestHex": "baa5a51038060000150018001b00100030004000500002000000000000000000",
+      "exitCode": 0,
+      "output": "{\"device\": \"/dev/hidraw5\", \"requestHex\": \"baa5a51038060000150018001b00100030004000500002000000000000000000\"}\n{\"returnedBytes\": 1, \"responseBufferHex\": \"0100000000000000000000000000000000000000000000000000000000000000\"}\n",
+      "error": "",
+      "finishedAt": "2026-10-17T15:41:10.817330+00:00"
+    },
+    {
+      "startedAt": "2026-10-17T17:05:34.703337+00:00",
+      "operation": "restore",
+      "requestHex": "baa5a51038060000140018001b00100030004000500002000000000000000000",
+      "exitCode": 0,
+      "output": "{\"device\": \"/dev/hidraw5\", \"requestHex\": \"baa5a51038060000140018001b00100030004000500002000000000000000000\"}\n{\"returnedBytes\": 1, \"responseBufferHex\": \"0100000000000000000000000000000000000000000000000000000000000000\"}\n",
+      "error": "",
+      "finishedAt": "2026-10-17T17:05:35.410740+00:00"
+    }
+  ],
+  "after": {
+    "source": "linux-hidraw",
+    "experimental": true,
+    "vendorId": 9390,
+    "productId": 6256,
+    "capturedAt": "2026-10-17T15:41:14.713792+00:00",
+    "batteryPercent": 56,
+    "dpiValues": [
+      1050,
+      1200,
+      1350,
+      800,
+      2400,
+      3200,
+      4000
+    ],
+    "enabledStages": 3,
+    "activeIndex": 2,
+    "activeDpi": 1350,
+    "pollingRateCode": 1,
+    "pollingRateHz": 1000,
+    "rawResponses": {
+      "battery": "010138",
+      "dpi-list": "01000000150018001b00100030004000500002000200020310001400",
+      "polling-rate": "010000000201ffff01020003150018001b0010003000400050000200"
+    }
+  },
+  "userPowerCycle": {
+    "confirmedByUser": true,
+    "mouseSwitchedOff": true,
+    "receiverUnplugged": true,
+    "recordedAt": "2026-10-17T16:03:36.643248+00:00",
+    "note": "Usuário confirmou desligar ambos e reconectar; ACL de hidraw5 foi perdida e sua reaplicação foi solicitada."
+  },
+  "verificationAttempts": [
+    {
+      "recordedAt": "2026-10-17T16:31:19.238043+00:00",
+      "result": "permission-denied-before-HID-output",
+      "device": "/dev/hidraw5",
+      "aclObserved": "root rw; group none; other none; no named user ACL",
+      "note": "Usuário confirmou reaplicação, mas nó atual não contém ACL. Sudo não interativo impedido por no_new_privileges; solicitada conferência no terminal local."
+    }
+  ],
+  "afterPowerCycle": {
+    "source": "linux-hidraw",
+    "experimental": true,
+    "vendorId": 9390,
+    "productId": 6256,
+    "capturedAt": "2026-10-17T17:05:23.303392+00:00",
+    "batteryPercent": 55,
+    "dpiValues": [
+      1050,
+      1200,
+      1350,
+      800,
+      2400,
+      3200,
+      4000
+    ],
+    "enabledStages": 3,
+    "activeIndex": 2,
+    "activeDpi": 1350,
+    "pollingRateCode": 1,
+    "pollingRateHz": 1000,
+    "rawResponses": {
+      "battery": "010137",
+      "dpi-list": "01000000150018001b00100030004000500002000200020310001400",
+      "polling-rate": "010000000201ffff01020003150018001b0010003000400050000200"
+    }
+  },
+  "powerCycleVerificationRequestedAt": "2026-10-17T17:05:23.305628+00:00",
+  "restored": {
+    "source": "linux-hidraw",
+    "experimental": true,
+    "vendorId": 9390,
+    "productId": 6256,
+    "capturedAt": "2026-10-17T17:05:39.354596+00:00",
+    "batteryPercent": 55,
+    "dpiValues": [
+      1000,
+      1200,
+      1350,
+      800,
+      2400,
+      3200,
+      4000
+    ],
+    "enabledStages": 3,
+    "activeIndex": 2,
+    "activeDpi": 1350,
+    "pollingRateCode": 1,
+    "pollingRateHz": 1000,
+    "rawResponses": {
+      "battery": "010137",
+      "dpi-list": "01000000140018001b00100030004000500002000200020310001400",
+      "polling-rate": "010000000201ffff01020003140018001b0010003000400050000200"
+    }
+  },
+  "conclusion": {
+    "configurationWriteConfirmed": true,
+    "survivedUserReportedPowerCycle": true,
+    "originalDpiTableRestoredAndReadBack": true,
+    "storageLocation": "mouse-or-receiver-undetermined",
+    "secondPowerCycleAfterRestoreTested": false
+  }
+}

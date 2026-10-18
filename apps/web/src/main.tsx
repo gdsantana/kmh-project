@@ -34,7 +34,7 @@ function App() {
       await closeInspections(handles.current);
       setInspections(current => current.map(i => ({...i, snapshot: {...i.snapshot, opened: i.device.opened}})));
       setReading(await readLocal());
-      setMessage('Bateria e DPI recebidos do receptor pela ponte local.');
+      setMessage('Bateria, DPI e polling rate recebidos do receptor pela ponte local.');
     } catch (cause) {
       setReadingError(cause instanceof Error ? cause.message : String(cause));
       setMessage('A leitura falhou. Nenhum valor anterior está sendo apresentado como atual.');
@@ -144,15 +144,16 @@ function App() {
     {error && <p className="notice" role="alert">{error}</p>}
     <div className="status" role="status"><span className={opened ? 'dot online' : 'dot'} />{message}</div>
     <section className="device" aria-labelledby="telemetry-title">
-      <h2 id="telemetry-title">Bateria e DPI</h2>
-      <p>Leia o nível de bateria e o DPI atual do MT760 conectado pelo receptor 2,4 GHz.</p>
-      <button className="secondary" onClick={readMouse} disabled={busy}>{busy ? 'Lendo…' : 'Ler bateria e DPI'}</button>
+      <h2 id="telemetry-title">Informações do mouse</h2>
+      <p>Leia bateria, DPI e polling rate configurado do MT760 conectado pelo receptor 2,4 GHz.</p>
+      <button className="secondary" onClick={readMouse} disabled={busy}>{busy ? 'Lendo…' : 'Ler informações do mouse'}</button>
       <p className="observed">Conexão pela ponte local Linux · Leitura experimental · Atualização manual</p>
       {readingError && <p className="notice" role="alert">{readingError}</p>}
       {reading && <div role="status">
         <dl className="telemetry-values"><div><dt>Bateria informada</dt><dd>{reading.batteryPercent}%</dd></div>
           <div><dt>DPI atual</dt><dd>{reading.activeDpi} DPI</dd></div>
-          <div><dt>Estágio ativo</dt><dd>{reading.activeIndex + 1} de {reading.enabledStages}</dd></div></dl>
+          <div><dt>Estágio ativo</dt><dd>{reading.activeIndex + 1} de {reading.enabledStages}</dd></div>
+          <div><dt>Polling rate configurado</dt><dd>{reading.pollingRateHz === null ? `Desconhecido (código ${reading.pollingRateCode})` : `${reading.pollingRateHz} Hz`}</dd></div></dl>
         <p>Estágios habilitados: {reading.dpiValues.slice(0, reading.enabledStages).join(' · ')} DPI</p>
         <p className="observed">Recebido do receptor em {new Date(reading.capturedAt).toLocaleString('pt-BR')} · Fonte: Linux hidraw</p>
         <button className="secondary" onClick={exportEvidence} disabled={busy}>Exportar leitura JSON</button>

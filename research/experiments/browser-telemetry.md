@@ -14,15 +14,15 @@ Evidência: [webhid-battery-probe.json](../captures/webhid-battery-probe.json). 
 ## Caminho que entregou os dados à página
 
 ```text
-Botão Ler bateria e DPI
+Botão Ler informações do mouse
   → POST http://127.0.0.1:5175/api/telemetry
   → ponte Python em loopback
-  → diagnóstico hidraw, consultas fixas AA e A4/0x638
+  → diagnóstico hidraw, consultas fixas AA, A4/0x638 e A4/0x630
   → GET_REPORT(Input), validação e decodificação
   → JSON → validação no cliente → valores na página
 ```
 
-A ponte usa o diagnóstico já testado; não usa as capturas salvas para servir dados. Cada clique executa duas consultas novas. O bloco 0x660 foi excluído desse caminho porque não é necessário para bateria/DPI e suas respostas têm o mesmo tamanho do bloco de DPI.
+A ponte usa o diagnóstico já testado; não usa as capturas salvas para servir dados. Desde 2026-10-17, cada clique executa três consultas novas: bateria, DPI e polling rate (bloco 0x630). O bloco 0x660 foi excluído desse caminho porque não é necessário para bateria/DPI e suas respostas têm o mesmo tamanho do bloco de DPI.
 
 A interface fecha os handles WebHID antes de consultar a ponte. A ponte serializa pedidos, restringe as consultas, identifica o dispositivo por VID/PID e hash do descritor, valida status/tamanho e limita cada processo a oito segundos. Decodifica o percentual, sete valores DPI, quantidade habilitada e índice atual; rejeita índice, quantidade ou bateria inválidos. As fórmulas estão em [experimento nativo](native-dpi-battery.md).
 
@@ -40,7 +40,7 @@ npm run bridge
 npm run dev
 ```
 
-Abra `http://127.0.0.1:5174/` e clique **Ler bateria e DPI**. Não precisa usar o seletor WebHID para a leitura pela ponte. O botão pode ser usado novamente para atualizar; não há consulta automática em segundo plano. **Exportar leitura JSON** preserva os valores e respostas brutas, identificando o transporte.
+Abra `http://127.0.0.1:5174/` e clique **Ler informações do mouse**. Não precisa usar o seletor WebHID para a leitura pela ponte. O botão pode ser usado novamente para atualizar; não há consulta automática em segundo plano. **Exportar leitura JSON** preserva os valores e respostas brutas, identificando o transporte.
 
 A API é somente local: bind em `127.0.0.1:5175`, Host validado e Origin restrito a `http://127.0.0.1:5174`, `http://localhost:5174` e equivalentes na porta 4173 do preview. Exige POST com header `X-Rapoo-Read: 1`, sem corpo. Não há API para fornecer comandos, endereços ou payloads. A requisição CORS passa por preflight; origens não autorizadas são rejeitadas antes do hardware. A ponte permanece ativa somente enquanto o processo estiver em execução.
 
@@ -51,6 +51,12 @@ A página recebeu **59% de bateria, 1350 DPI, estágio 3 de 3**, com estágios h
 Paramos a ponte, clicamos novamente e confirmamos mensagem de indisponibilidade e remoção dos valores anteriores. Após reiniciar, uma nova leitura voltou a mostrar dados reais. Imagem do erro: [browser-bridge-unavailable.png](../captures/browser-bridge-unavailable.png).
 
 `npm test` executa os testes TypeScript e Python: pacotes fixos, timeout, dados inválidos, decodificação das capturas do ciclo físico, falha do worker, proteção de origem/Host/payload e concorrência. `npm run build` verifica tipos e gera a aplicação.
+
+## Atualização: polling rate
+
+Em 2026-10-17, incluímos a leitura de taxa configurada: byte 5 do bloco 0x630 para a variante wireless, códigos 8/4/2/1 = 125/250/500/1000 Hz. O receptor retornou código 1 duas vezes, com sobreposição coerente com o bloco DPI. A ponte retornou 1000 Hz, 1350 DPI e 54% de bateria; o usuário confirmou 1000 Hz no painel. [Análise e evidências](../software-analysis/polling-rate.md).
+
+A UI mostra **Polling rate configurado**, e código desconhecido não recebe frequência presumida. A ponte consulta três registros fixos e rejeita blocos A4 cuja região comum não corresponda. O cliente espera até 30 segundos; cada subprocesso continua limitado a oito segundos. Esse campo não mede a taxa real de eventos.
 
 ## Limites restantes
 

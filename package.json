@@ -11,7 +11,7 @@
     "bridge": "python3 apps/bridge/server.py",
     "dev": "npm run dev -w @rapoo/web",
     "build": "tsc --noEmit && npm run build -w @rapoo/web",
-    "test": "node --experimental-strip-types --test tests/*.test.ts && python3 tests/bridge_test.py"
+    "test": "node --experimental-strip-types --test tests/*.test.ts && python3 -m unittest discover -s tests -p '*_test.py'"
   },
   "devDependencies": {
     "typescript": "7.0.2",

@@ -11,3 +11,10 @@
 - `browser-bridge-unavailable.png`: indisponibilidade da ponte exibida na página, sem manter os valores anteriores como atuais.
 
 Descritores sysfs independentes estão em `../device-identification/rapoo-24ae-1870-sysfs.json`. Até agora nenhum comando de configuração foi observado.
+
+- `mt760-native-polling-rate.json`: duas respostas idênticas A4/0x630, código wireless 1 = 1000 Hz e comparação com o bloco DPI.
+- `bridge-polling-rate-reading.json`: endpoint real da ponte retornando 54% de bateria, 1350 DPI e 1000 Hz em 2026-10-17. O usuário confirmou o valor de polling rate na página; não houve screenshot nesta sessão.
+
+- `mt760-dpi-write-20261017T154052865924Z.json`: backup original, solicitação/ACK de 1000→1050 DPI no primeiro estágio inativo, leitura imediata, confirmação humana do ciclo físico, leitura persistente e gravação/ACK/leitura de restauração para 1000 DPI. Inclui tentativas bloqueadas por permissão, sem gravações adicionais nessas falhas.
+
+- `bridge-after-dpi-restore.json`: resposta real da ponte reativada após o experimento, com a tabela original, 1350 DPI ativos e 1000 Hz.

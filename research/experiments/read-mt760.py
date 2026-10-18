@@ -11,7 +11,7 @@ import sys
 import time
 
 DESCRIPTOR_SHA256 = "d6316567a9545dd700ac3d5f2d2d23ff408e2ee1125c5ea385a7dae38aa34738"
-QUERIES = {"battery": (0xAA, 0, 0), "dpi-list": (0xA4, 0x18, 0x638), "dpi-state": (0xA4, 0x18, 0x660)}
+QUERIES = {"battery": (0xAA, 0, 0), "dpi-list": (0xA4, 0x18, 0x638), "dpi-state": (0xA4, 0x18, 0x660), "polling-rate": (0xA4, 0x18, 0x630)}
 
 
 def request(name):
@@ -68,6 +68,7 @@ def main():
         assert request("battery") == bytes.fromhex("ba a5 aa 00 00 00 00 00") + bytes(24)
         assert request("dpi-list") == bytes.fromhex("ba a5 a4 18 38 06 00 00") + bytes(24)
         assert request("dpi-state") == bytes.fromhex("ba a5 a4 18 60 06 00 00") + bytes(24)
+        assert request("polling-rate") == bytes.fromhex("ba a5 a4 18 30 06 00 00") + bytes(24)
         try:
             request("write")
         except KeyError:
@@ -106,7 +107,7 @@ def main():
             raise PermissionError(f"Sem acesso a {path}; nenhuma consulta enviada")
         print(json.dumps({"capturedAt": datetime.datetime.now(datetime.timezone.utc).isoformat(),
                           "experimental": True, "descriptorSha256": DESCRIPTOR_SHA256}), flush=True)
-        for name in QUERIES:
+        for name in ("battery", "dpi-list", "dpi-state"):
             try:
                 result = subprocess.run([sys.executable, __file__, "--worker", name],
                                         capture_output=True, text=True, timeout=8)

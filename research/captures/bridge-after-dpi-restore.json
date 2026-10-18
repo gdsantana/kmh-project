@@ -1,0 +1,27 @@
+{
+  "source": "linux-hidraw",
+  "experimental": true,
+  "vendorId": 9390,
+  "productId": 6256,
+  "capturedAt": "2026-10-17T17:07:19.777080+00:00",
+  "batteryPercent": 55,
+  "dpiValues": [
+    1000,
+    1200,
+    1350,
+    800,
+    2400,
+    3200,
+    4000
+  ],
+  "enabledStages": 3,
+  "activeIndex": 2,
+  "activeDpi": 1350,
+  "pollingRateCode": 1,
+  "pollingRateHz": 1000,
+  "rawResponses": {
+    "battery": "010137",
+    "dpi-list": "01000000140018001b00100030004000500002000200020310001400",
+    "polling-rate": "010000000201ffff01020003140018001b0010003000400050000200"
+  }
+}

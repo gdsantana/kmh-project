@@ -25,6 +25,33 @@ class BridgeTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 bridge.decode(bad_battery, bad_dpi)
 
+    def test_polling_uses_wireless_field_and_checks_overlap(self):
+        capture = json.loads((ROOT / "research/captures/mt760-native-polling-rate.json").read_text())
+        polling, dpi, repeated = [bytes.fromhex(q["responseBufferHex"])[:q["returnedBytes"]] for q in capture["samples"]]
+        self.assertEqual(polling, repeated)
+        self.assertEqual(polling[4], 2)  # Adjacent wired field differs from the wireless setting.
+        self.assertEqual(bridge.decode_polling(polling, dpi), {"pollingRateCode": 1, "pollingRateHz": 1000})
+        for code, hz in ((8, 125), (4, 250), (2, 500), (1, 1000), (3, None)):
+            changed = bytearray(polling)
+            changed[5] = code
+            self.assertEqual(bridge.decode_polling(changed, dpi), {"pollingRateCode": code, "pollingRateHz": hz})
+        for invalid in (polling[:3], b"\x02" + polling[1:], polling[:12] + b"\xff" + polling[13:], dpi):
+            with self.assertRaises(ValueError):
+                bridge.decode_polling(invalid, dpi)
+
+    def test_snapshot_collects_only_three_fixed_queries(self):
+        capture = json.loads((ROOT / "research/captures/mt760-native-polling-rate.json").read_text())
+        battery = json.loads((ROOT / "research/captures/mt760-native-baseline.json").read_text())["queries"][0]
+        polling, dpi, _ = capture["samples"]
+        outputs = []
+        for name, q in (("battery", battery), ("dpi-list", dpi), ("polling-rate", polling)):
+            output = json.dumps({"query": name, "responseHex": q["responseBufferHex"], "ioctlReturn": q["returnedBytes"]})
+            outputs.append(subprocess.CompletedProcess([], 0, output, ""))
+        with patch.object(bridge.subprocess, "run", side_effect=outputs) as worker:
+            result = bridge.read_snapshot()
+            self.assertEqual(result["pollingRateHz"], 1000)
+            self.assertEqual([c.args[0][-1] for c in worker.call_args_list], ["battery", "dpi-list", "polling-rate"])
+
     def test_worker_failure_or_timeout_prevents_partial_snapshot(self):
         for failure in (subprocess.CompletedProcess([], 1, "", "permission denied"), subprocess.TimeoutExpired([], 8)):
             with patch.object(bridge.subprocess, "run", side_effect=[failure]) as worker:

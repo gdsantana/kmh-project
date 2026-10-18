@@ -4,9 +4,9 @@
 
 Projeto independente para investigar protocolos e desenvolver ferramentas locais de leitura e configuração de **teclados, mouses e fones de ouvido/headsets**. O suporte a cada dispositivo será baseado em descritores, capturas e testes físicos, com compatibilidade documentada.
 
-A implementação atual é uma PoC de leitura do **mouse Rapoo MT760 via receptor 2,4 GHz**: inspeção WebHID e bateria/DPI recebidos no navegador por uma ponte Python Linux. Teclados e fones de ouvido fazem parte do escopo de evolução e ainda não possuem suporte implementado. A interface atual continua dedicada ao experimento MT760.
+A implementação atual é uma PoC de leitura do **mouse Rapoo MT760 via receptor 2,4 GHz**: inspeção WebHID e bateria/DPI/polling rate recebidos no navegador por uma ponte Python Linux. Teclados e fones de ouvido fazem parte do escopo de evolução e ainda não possuem suporte implementado. A interface atual continua dedicada ao experimento MT760.
 
-React + TypeScript + Vite em um workspace npm. Sem conta, serviço externo ou comandos de gravação de configuração implementados.
+React + TypeScript + Vite em um workspace npm. Sem conta ou serviço externo. O painel e a ponte HTTP são somente de leitura; há um experimento separado e supervisionado de gravação da tabela DPI.
 
 Repositório: [gdsantana/kmh-project](https://github.com/gdsantana/kmh-project). O nome anterior era `rappo-mouse`.
 
@@ -107,13 +107,13 @@ Há um diagnóstico nativo reutilizado pela ponte local de leitura. O [HANDOFF.M
 
 PoC validada no dispositivo físico `24AE:1870`: nome e descritores exibidos pelo navegador, coleção do fabricante `0xFF01` aberta depois da permissão específica em hidraw6. Fechamento e reabertura também confirmados. As outras duas interfaces tiveram abertura negada nessa captura inicial.
 
-Evidência exportada pela própria aplicação: [JSON real](research/captures/rapoo-24ae-1870-webhid-open.json). Captura: [interface aberta](research/captures/webhid-interface-open.png). Gravação de configurações permanece não verificada.
+Evidência exportada pela própria aplicação: [JSON real](research/captures/rapoo-24ae-1870-webhid-open.json). Captura: [interface aberta](research/captures/webhid-interface-open.png). A gravação experimental da tabela DPI foi confirmada por leitura posterior; veja a etapa de configuração abaixo para o estado da verificação de persistência.
 
-## Leitura direta de DPI e bateria
+## Leitura direta de DPI, bateria e polling rate
 
 O experimento Linux posterior, após permissão específica na interface `FF00/0E` (hidraw5 no teste), obteve bateria informada de **59%** e três estágios habilitados: **1000, 1200, 1350 DPI**. Três toques físicos confirmaram o ciclo `1350 → 1000 → 1200 → 1350`, restaurando o estado original.
 
-**Esses dados agora chegam à página por uma ponte local Linux.** Em outro terminal, execute `npm run bridge`, mantenha `npm run dev` ativo e clique **Ler bateria e DPI** em `http://127.0.0.1:5174/`. Requer Python 3 e permissão hidraw; não precisa de um novo seletor WebHID. A atualização é manual, e falhas removem os valores anteriores da tela. A ponte escuta somente em `127.0.0.1:5175` e aceita apenas as consultas fixas de leitura vindas das origens locais permitidas.
+**Esses dados agora chegam à página por uma ponte local Linux.** Em outro terminal, execute `npm run bridge`, mantenha `npm run dev` ativo e clique **Ler informações do mouse** em `http://127.0.0.1:5174/`. Requer Python 3 e permissão hidraw; não precisa de um novo seletor WebHID. A atualização é manual, e falhas removem os valores anteriores da tela. A ponte escuta somente em `127.0.0.1:5175` e aceita apenas as consultas fixas de leitura vindas das origens locais permitidas.
 
 O teste WebHID enviou a consulta sem erro, mas não recebeu evento BA em três segundos. A resposta veio por GET_REPORT(Input) nativo, justificando a ponte. Isso não altera a configuração do mouse.
 
@@ -122,5 +122,14 @@ O teste WebHID enviou a consulta sem erro, mas não recebeu evento BA em três s
 - [Índice das evidências](research/captures/README.md): respostas brutas, transições, restauração e tentativa inválida.
 - [Script de diagnóstico](research/experiments/read-mt760.py): somente biblioteca padrão Python, consultas fixas e self-test.
 - [Integração no navegador](research/experiments/browser-telemetry.md): teste WebHID, ponte, execução, evidências e limites.
+- [Descoberta do polling rate](research/software-analysis/polling-rate.md): consulta wireless, códigos, captura real e validação.
+
+Em 2026-10-17, a leitura do registro 0x630 revelou **1000 Hz configurados para a conexão wireless**. O painel mostra o polling rate junto de bateria e DPI; a ponte compara a região comum dos blocos DPI/taxa e não presume frequência para códigos desconhecidos. Isso é a configuração informada pelo dispositivo, não uma medição física da frequência.
 
 Leitura na página via ponte confirmada; WebHID puro não recebeu resposta no teste realizado. Comparação com a tela do software oficial e compatibilidade com outros firmwares continuam pendentes. O diagnóstico é experimental e ainda não resolve respostas antigas de mesmo tamanho.
+
+## Primeiro experimento de configuração
+
+Em 2026-10-17, o script separado [write-mt760-dpi.py](research/experiments/write-mt760-dpi.py) gravou o primeiro estágio inativo de 1000 para 1050 DPI. ACK e leituras estáveis confirmaram a alteração, preservando 1350 DPI ativos e 1000 Hz. O backup original é salvo antes do envio e há um comando de restauração com verificação. O painel e a API HTTP não expõem escrita.
+
+[Procedimento, rotina do driver, pacote e resultados](research/experiments/write-dpi.md). A alteração de teste sobreviveu ao ciclo de energia do mouse e receptor confirmado pelo usuário. Os 1000 DPI originais foram restaurados e conferidos por leitura; a ponte foi reativada. O JSON registra antes, depois, após reinício e restauração. A localização física do armazenamento permanece desconhecida, e não foi feito um novo ciclo após restaurar.

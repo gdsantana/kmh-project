@@ -1,4 +1,4 @@
-"""Loopback-only bridge for the two observed MT760 read queries."""
+"""Loopback-only bridge for fixed, observed MT760 read queries."""
 import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
@@ -27,9 +27,18 @@ def decode(battery, dpi):
             "activeIndex": index, "activeDpi": values[index]}
 
 
+def decode_polling(polling, dpi):
+    if len(polling) != 28 or polling[0] != 1 or len(dpi) != 28 or dpi[0] != 1:
+        raise ValueError("Resposta de polling rate inválida.")
+    if polling[12:28] != dpi[4:20]:
+        raise ValueError("Blocos de polling rate e DPI incompatíveis; leitura descartada.")
+    code = polling[5]  # Wireless getter uses register 0x631; wired getter uses 0x630.
+    return {"pollingRateCode": code, "pollingRateHz": {8: 125, 4: 250, 2: 500, 1: 1000}.get(code)}
+
+
 def read_snapshot():
     replies = {}
-    for name in ("battery", "dpi-list"):
+    for name in ("battery", "dpi-list", "polling-rate"):
         result = subprocess.run([sys.executable, str(DIAGNOSTIC), "--worker", name],
                                 capture_output=True, text=True, timeout=8)
         if result.returncode:
@@ -43,6 +52,7 @@ def read_snapshot():
     return {"source": "linux-hidraw", "experimental": True, "vendorId": 0x24AE, "productId": 0x1870,
             "capturedAt": datetime.datetime.now(datetime.timezone.utc).isoformat(),
             **decode(replies["battery"], replies["dpi-list"]),
+            **decode_polling(replies["polling-rate"], replies["dpi-list"]),
             "rawResponses": {name: data.hex() for name, data in replies.items()}}
 
 

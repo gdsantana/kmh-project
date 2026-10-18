@@ -5,16 +5,19 @@ import { readLocal, validateReading } from '../apps/web/src/local-reader.ts';
 
 function fixture() {
   const capture = JSON.parse(readFileSync(new URL('../research/captures/mt760-native-restored.json', import.meta.url), 'utf8'));
+  const polling = JSON.parse(readFileSync(new URL('../research/captures/mt760-native-polling-rate.json', import.meta.url), 'utf8'));
   return {source:'linux-hidraw', experimental:true, vendorId:0x24ae, productId:0x1870, capturedAt:capture.capturedAt,
-    batteryPercent:59, dpiValues:[1000,1200,1350,800,2400,3200,4000], enabledStages:3, activeIndex:2, activeDpi:1350,
-    rawResponses:Object.fromEntries(capture.queries.slice(0,2).map((q: {name:string; responseBufferHex:string; returnedBytes:number}) => [q.name,q.responseBufferHex.slice(0,q.returnedBytes*2)]))};
+    batteryPercent:59, dpiValues:[1000,1200,1350,800,2400,3200,4000], enabledStages:3, activeIndex:2, activeDpi:1350, pollingRateCode:1, pollingRateHz:1000,
+    rawResponses:{'polling-rate':polling.samples[0].responseBufferHex.slice(0,56), ...Object.fromEntries(capture.queries.slice(0,2).map((q: {name:string; responseBufferHex:string; returnedBytes:number}) => [q.name,q.responseBufferHex.slice(0,q.returnedBytes*2)]))}};
 }
 
 test('accepts observed telemetry and rejects malformed or inconsistent values', () => {
   const data = fixture();
   assert.equal(validateReading(data).activeDpi, 1350);
+  assert.equal(validateReading(data).pollingRateHz, 1000);
+  assert.equal(validateReading({...data, pollingRateCode:3, pollingRateHz:null}).pollingRateHz, null);
   for (const invalid of [null, {}, {...data,batteryPercent:101}, {...data,activeIndex:3}, {...data,activeDpi:1000},
-    {...data,capturedAt:'bad'}, {...data,rawResponses:{}}, {...data,source:'WebHID'}]) {
+    {...data,pollingRateHz:500}, {...data,pollingRateCode:256}, {...data,capturedAt:'bad'}, {...data,rawResponses:{}}, {...data,source:'WebHID'}]) {
     assert.throws(() => validateReading(invalid), /dados inválidos/);
   }
 });

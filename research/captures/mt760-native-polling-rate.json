@@ -1,0 +1,41 @@
+{
+  "model": "MT760",
+  "connection": "2.4 GHz receiver",
+  "firmware": null,
+  "device": "/dev/hidraw5",
+  "sourceDriverSha256": "4af207a5af13f860218df727619219df90420d4038ad3c3aa49db537235d84a7",
+  "samples": [
+    {
+      "capturedAt": "2026-10-17T15:23:07.897374+00:00",
+      "query": "polling-rate",
+      "requestHex": "baa5a41830060000000000000000000000000000000000000000000000000000",
+      "responseBufferHex": "010000000201ffff01020003140018001b001000300040005000020000000000",
+      "returnedBytes": 28
+    },
+    {
+      "capturedAt": "2026-10-17T15:23:08.537487+00:00",
+      "query": "dpi-list",
+      "requestHex": "baa5a41838060000000000000000000000000000000000000000000000000000",
+      "responseBufferHex": "01000000140018001b0010003000400050000200020002031000140000000000",
+      "returnedBytes": 28
+    },
+    {
+      "capturedAt": "2026-10-17T15:23:09.196951+00:00",
+      "query": "polling-rate",
+      "requestHex": "baa5a41830060000000000000000000000000000000000000000000000000000",
+      "responseBufferHex": "010000000201ffff01020003140018001b001000300040005000020000000000",
+      "returnedBytes": 28
+    }
+  ],
+  "interpretation": {
+    "wirelessCodeOffset": 5,
+    "wirelessCode": 1,
+    "pollingRateHz": 1000,
+    "nominalIntervalMs": 1,
+    "adjacentCodeOffset4": 2,
+    "pollingSamplesIdentical": true,
+    "dpiOverlapMatched": true,
+    "independentReferenceChecked": false
+  },
+  "configurationWritesSent": false
+}

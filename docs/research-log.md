@@ -71,3 +71,24 @@ Decisão: PoC de acesso pelo navegador concluída; continuar WebHID para investi
 
 - Processo consolidado em `docs/retomada-dpi-bateria.md`, vinculado no início do README: descoberta, protocolo observado, execução/ACL, fluxo dos arquivos, evidências, validações e prioridades da próxima sessão.
 - Mantido o HANDOFF original de objetivos. O novo registro distingue estado implementado, resultados históricos e hipóteses pendentes, incluindo a limitação de respostas antigas e os arquivos ainda não versionados.
+
+## 2026-10-17 — polling rate configurado do MT760 wireless
+
+- Vtable wireless slot 19 aponta para 0x005280C0: consulta A4/0x630, comprimento 0x18, offset 5. A classe comum usa offset 4; a distinção é relevante porque os campos retornaram valores diferentes.
+- Hash, vtable, pacote e switch conferidos por asserts no executável oficial 1.2.1. Códigos 8/4/2/1 associados a 125/250/500/1000 Hz pelas rotinas e nomes do driver.
+- A ACL temporária anterior não estava ativa. Usuário reaplicou liberação específica de hidraw5. Leituras polling/DPI/polling retornaram blocos de taxa idênticos e região sobreposta compatível com DPI.
+- Campo wireless 1 = 1000 Hz nominal; campo adjacente 2 não foi usado como frequência desta conexão. Nenhuma escrita de configuração executada.
+- Ponte e painel atualizados com pollingRateCode/pollingRateHz e dados brutos. Códigos desconhecidos permanecem sem frequência associada; comparação dos blocos reduz confusão de respostas A4, mas não substitui identificação de transação.
+- Endpoint real entregou 54% de bateria, 1350 DPI, 1000 Hz. Usuário confirmou 1000 Hz no navegador; sem automação visual/screenshot nesta sessão.
+- Testes: 14 TypeScript e 5 Python, build e self-test aprovados. Driver oficial como referência visual e medição física da taxa continuam pendentes.
+- Registro completo em research/software-analysis/polling-rate.md; capturas em research/captures/mt760-native-polling-rate.json e bridge-polling-rate-reading.json.
+
+## 2026-10-17 — primeira configuração persistente de DPI e restauração
+
+- Setter da tabela: vtable wireless slot 42 → 0x0051E9D0, operação A5, comprimento 16, registro 0x638. Empacotamento divide DPI por 50 e preserva sete valores, quantidade e reservado. Conferência por asserts no driver oficial 1.2.1.
+- Script supervisionado write-mt760-dpi.py preparado e testado; a ponte foi pausada para evitar consultas concorrentes. Primeiro prepare recebeu status 02 de bateria e parou sem escrever; nova preparação obteve leituras estáveis e salvou backup.
+- Um envio alterou apenas o estágio 1, inativo: 1000→1050 DPI. ACK 01 e duas sequências de leitura confirmaram o resultado, preservando 1350 DPI ativos e 1000 Hz.
+- Usuário confirmou desligar mouse e retirar/reconectar receptor. A ACL foi perdida na reconexão; verificações ficaram bloqueadas sem novas escritas até a liberação local ser efetiva. O processo do agente não pôde executar sudo devido a no_new_privileges; usuário conferiu ACL no terminal.
+- Depois do ciclo, duas sequências estáveis ainda mostraram 1050 DPI sem reenvio do comando. Um envio de restauração, ACK e duas sequências de leitura confirmaram a tabela original com 1000 DPI no primeiro estágio.
+- Evidência mt760-dpi-write-20261017T154052865924Z.json contém todos os estados, requests/ACKs, confirmação física humana e bloqueios de acesso. Ponte somente de leitura reativada.
+- Testes: 14 TypeScript e 11 Python, incluindo fixture real de aplicação/ciclo/restauração; build aprovado. Local físico da memória e um novo ciclo após restaurar não foram verificados. A API e a UI permanecem sem escrita.
