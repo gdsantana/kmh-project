@@ -2,33 +2,41 @@
 
 **Status: proposta de desenvolvimento, atualizada em 2026-10-17.**
 
-O front será desenvolvido em **React + TypeScript + Vite**, reaproveitando a interface atual dentro de uma WebView do **Tauri 2**. Ele apresenta estados e configurações; o [núcleo Rust](arquitetura-nucleo.md) executa o monitoramento e a comunicação com os dispositivos. A [visão geral](arquitetura-geral.md) define o contrato entre os dois blocos.
+O front será desenvolvido em **React + TypeScript + Vite**, com a mesma interface para **desktop Tauri 2** e **site no navegador**. Componentes, formulários e estado de apresentação serão compartilhados. O acesso aos dispositivos ficará atrás de um contrato `DeviceClient`, com implementações próprias para cada ambiente.
+
+No desktop, o [núcleo Rust](arquitetura-nucleo.md) executa o monitoramento e a comunicação com os dispositivos. No navegador, um cliente WebHID executará somente protocolos e operações compatíveis com essa API, enquanto a página estiver ativa. O site poderá funcionar sem núcleo instalado para esses dispositivos; isso **ainda não foi validado para o MT760**. A [visão geral](arquitetura-geral.md) descreve os dois modos. Esta mudança prepara a arquitetura; os adaptadores ainda não estão implementados.
 
 ## 1. Hierarquia da interface
 
 ```mermaid
 flowchart TB
-    Front["Front React na WebView Tauri"]
+    Front["Front React compartilhado - desktop e navegador"]
     Front --> Shell["Janela e navegação"]
     Shell --> List["Lista de dispositivos"]
     Shell --> Detail["Detalhes do periférico selecionado"]
     Detail --> State["Bateria, estado e última leitura"]
     Detail --> Config["Configurações suportadas pelo modelo"]
     Shell --> Preferences["Monitoramento e notificações"]
-    Front --> Client["Cliente IPC tipado"]
-    Client --> Commands["Comandos com resultado"]
-    Client --> Events["Recepção de eventos"]
+    Front --> Client["Contrato DeviceClient"]
+    Client --> Desktop["Cliente desktop - IPC Tauri e núcleo Rust"]
+    Client --> Browser["Cliente browser - protocolo e WebHID"]
+    Client --> Commands["Operações e capacidades normalizadas"]
+    Client --> Events["Snapshots e eventos normalizados"]
     Front --> Store["Estado de apresentação por dispositivo"]
     Store --> Feedback["Avisos internos e operações em andamento"]
 ```
 
-Uma organização inicial possível dentro de `apps/web/src` é separar `ipc`, `devices`, `settings` e componentes compartilhados conforme surgirem. O cliente IPC será a fronteira com o núcleo; componentes visuais não terão conhecimento de bytes HID nem de caminhos do sistema.
+Uma organização inicial possível dentro de `apps/web/src` é separar `device-client` (contrato e implementações), `devices`, `settings` e componentes compartilhados conforme surgirem. O ponto de entrada recebe a implementação de `DeviceClient` e a fornece aos hooks React. Componentes não importam APIs do Tauri, `navigator.hid`, bytes HID ou caminhos do sistema.
+
+O build desktop selecionará explicitamente o cliente IPC; o build web selecionará o cliente WebHID, verificando a disponibilidade da API antes de oferecer conexão. Falta de suporte ou permissão produz um estado explicável na tela. Uma falha do núcleo não deve provocar uma troca automática de transporte, especialmente durante uma gravação.
+
+O pacote existente `packages/transport-webhid` será reaproveitado para o acesso WebHID após avaliar seu contrato atual. Ele não substitui o protocolo de cada modelo. O nome existente `packages/core` também não significa que o núcleo Rust já exista. Inicialmente, manter a interface em `apps/web`; extrair um pacote de UI apenas se houver necessidade de pontos de entrada separados.
 
 Não é necessário introduzir uma biblioteca global de estado imediatamente. Contexto e hooks React podem atender à primeira versão; crescimento e requisitos concretos orientarão essa decisão.
 
 ## 2. Informações apresentadas
 
-A lista deverá permitir distinguir mouse, teclado, headset e múltiplas unidades do mesmo tipo. Cada item usa o `deviceId` fornecido pelo núcleo, não o nome exibido ou apenas VID/PID.
+A lista deverá permitir distinguir mouse, teclado, headset e múltiplas unidades do mesmo tipo. Cada item usa o `deviceId` fornecido pelo cliente ativo, não o nome exibido ou apenas VID/PID. No navegador, a identidade pode ser limitada à sessão; não prometer reconhecimento persistente entre máquinas ou reconexões sem um identificador confiável.
 
 O painel do dispositivo deverá apresentar:
 
@@ -42,7 +50,22 @@ Para o MT760, a primeira implementação pode apresentar os campos já pesquisad
 
 ## 3. Comunicação e sincronização
 
-O cliente IPC centraliza os comandos e a recepção de eventos, mantendo a mesma terminologia da [arquitetura geral](arquitetura-geral.md). O front não executará timers para consultar o hardware: ele recebe o estado mantido pelo núcleo.
+O `DeviceClient` centraliza operações, snapshots e eventos, mantendo a mesma terminologia da [arquitetura geral](arquitetura-geral.md). No desktop, sua implementação traduz as operações para IPC. No navegador, ela coordena o protocolo sobre WebHID e mantém o estado apenas enquanto a sessão da página existir. Componentes visuais não executam timers HID; consultas periódicas, quando necessárias e suportadas, pertencem à implementação do cliente.
+
+### Contrato comum proposto
+
+| Operação | Papel |
+| --- | --- |
+| `getEnvironment()` | Informa ambiente, disponibilidade do transporte e recursos do aplicativo |
+| `requestDeviceAccess()` | Solicita seleção/permissão quando necessária; no browser deve partir de uma ação do usuário |
+| `listDevices()` e `getDeviceSnapshot()` | Retornam dispositivos autorizados, capacidades, estado e validade das leituras |
+| `subscribe(listener)` | Entrega eventos normalizados e retorna a função de remoção do listener |
+| `applyDeviceConfig(request)` | Solicita alteração validada e retorna o resultado observado, incluindo estado incerto |
+| `dispose()` | Libera listeners e recursos do cliente; no desktop não encerra o núcleo residente |
+
+Os nomes são uma proposta, sem implementação nesta etapa. Os tipos do contrato serão independentes de Tauri e WebHID. O contrato IPC Rust deve corresponder a esses tipos; gerar os bindings ou verificar sua correspondência em vez de manter versões divergentes. No browser, a codificação dos pacotes fica na camada de protocolo, fora de React.
+
+O snapshot mantém `deviceId`, `sessionId`, revisões e instante de leitura conforme a arquitetura do núcleo. No browser, o cliente fornece esses campos para sua própria sessão; eles não são identificadores globais nem versões fornecidas pelo firmware. O transporte escolhido permanece fixo durante a operação.
 
 Ao abrir ou recriar a interface:
 
@@ -52,17 +75,17 @@ Ao abrir ou recriar a interface:
 4. Processar as atualizações seguintes sem reaplicar estados antigos.
 5. Solicitar novo snapshot ao detectar uma inconsistência ou restabelecer a comunicação. Eventos não são uma fila durável nem substituem a sincronização inicial.
 
-Listeners devem ser removidos no descarte dos componentes para não duplicar avisos ao reabrir a janela. O núcleo permanece ativo mesmo quando não há nenhum listener React.
+Listeners devem ser removidos no descarte dos componentes para não duplicar avisos ao reabrir a janela. No desktop, o núcleo permanece ativo mesmo quando não há nenhum listener React. No browser, descarregar a página encerra a sessão; ao retornar, obter novas leituras antes de apresentar valores como atuais.
 
 ### Fluxo de recebimento de informações
 
 ```mermaid
 flowchart TD
-    Open["Interface aberta ou recriada"] --> Listen["Registrar listeners IPC"]
-    Listen --> Snapshot["Solicitar snapshots do núcleo"]
+    Open["Interface aberta ou recriada"] --> Listen["Registrar listeners do DeviceClient"]
+    Listen --> Snapshot["Solicitar snapshots ao cliente ativo"]
     Snapshot --> Merge["Conciliar snapshots e eventos recebidos durante a carga"]
     Merge --> Show["Renderizar estado por dispositivo"]
-    Event["Nova atualização do núcleo"] --> Check{"Sessão e revisão são atuais?"}
+    Event["Nova atualização do cliente ativo"] --> Check{"Sessão e revisão são atuais?"}
     Check -->|"Não"| Ignore["Ignorar estado antigo ou solicitar sincronização"]
     Check -->|"Sim"| Update["Atualizar estado de apresentação"]
     Update --> Show
@@ -71,19 +94,48 @@ flowchart TD
     Notice -->|"Não"| Keep["Manter o estado atualizado sem toast"]
 ```
 
-O front não presume que uma mudança foi originada pelo clique na interface. O usuário pode ter pressionado o botão físico de DPI ou alterado o dispositivo em outro programa; o estado recebido do núcleo prevalece sobre o último valor exibido.
+O front não presume que uma mudança foi originada pelo clique na interface. O usuário pode ter pressionado o botão físico de DPI ou alterado o dispositivo em outro programa; o estado confirmado pelo cliente ativo prevalece sobre o último valor exibido.
 
 ## 4. Edição de configuração
 
-A tela deve distinguir **valor observado** e **edição ainda não aplicada**. Exemplo: o dispositivo informa 1350 DPI, e o usuário preenche 1400; até o núcleo confirmar a gravação, o valor observado continua 1350.
+A tela deve distinguir **valor observado** e **edição ainda não aplicada**. Exemplo: o dispositivo informa 1350 DPI, e o usuário preenche 1400; até o cliente ativo confirmar a gravação por leitura, o valor observado continua 1350.
 
-Ao aplicar, o front envia `deviceId`, `sessionId`, `requestId`, `expectedConfigRevision` e os campos desejados por `apply_device_config`. O núcleo valida novamente todos os dados. Se a configuração mudou desde o início da edição, a interface solicita atualização e revisão do usuário em vez de sobrescrever silenciosamente.
+Ao aplicar, o front envia `deviceId`, `sessionId`, `requestId`, `expectedConfigRevision` e os campos desejados por `applyDeviceConfig`. No desktop, o cliente traduz a chamada para `apply_device_config`; o núcleo valida novamente todos os dados. No browser, a implementação WebHID também valida parâmetros e capacidades antes de montar qualquer pacote. Se a configuração mudou desde o início da edição, a interface solicita atualização e revisão do usuário em vez de sobrescrever silenciosamente.
 
 Durante a operação, apresentar progresso e bloquear submissões conflitantes daquele dispositivo. Dispositivos independentes podem continuar sendo acompanhados. Em erro ou perda de conexão, mostrar resultado desconhecido quando apropriado; não declarar sucesso por ter recebido apenas confirmação de envio.
 
-O resultado deverá permitir distinguir alteração confirmada, falha sem alteração, restauração confirmada e estado incerto. Fechar a janela não deve cancelar abruptamente uma gravação que o núcleo já iniciou.
+O resultado deverá permitir distinguir alteração confirmada, falha sem alteração, restauração confirmada e estado incerto. No desktop, fechar a janela não deve cancelar abruptamente uma gravação que o núcleo já iniciou. No browser, o usuário deve manter a página aberta e o dispositivo conectado durante a operação; suspensão ou fechamento pode impedir a confirmação. Na próxima conexão, reler o estado, sem repetir a escrita automaticamente.
+
+### Capacidades por dispositivo, operação e ambiente
+
+A UI habilita controles conforme o suporte **do protocolo e do transporte ativo**, não apenas pelo modelo. Cada recurso, como leitura de bateria, gravação de tabela DPI, polling rate ou botões, informa disponibilidade e motivo da indisponibilidade. Recursos de ambiente, como bandeja e monitoramento residente, são separados das capacidades do periférico.
+
+No browser, `sendReport()` concluir não comprova gravação. Só habilitar escrita quando for possível obter o estado original, validar os campos, enviar o comando e confirmar por leitura. Testar persistência após ciclo de energia é uma validação adicional; um ACK isolado não a comprova. Configurações salvas no armazenamento da página são preferências locais do site, não dados gravados na memória do mouse.
+
+O teste atual do MT760 enviou uma consulta pelo WebHID sem receber `inputreport`; a resposta veio por `GET_REPORT(Input)` nativo. WebHID não expõe diretamente essa leitura. Logo, as operações que dependem dela continuam indisponíveis no modo web até validar outra rota. O experimento DPI comprovou persistência após reinício de mouse e receptor, mas não identificou em qual deles está o armazenamento. [Evidência do browser](../research/experiments/browser-telemetry.md), [experimento de escrita](../research/experiments/write-dpi.md), [API WebHID](https://developer.chrome.com/docs/capabilities/hid).
+
+### Fluxo de aplicação compartilhado
+
+```mermaid
+flowchart TD
+    Edit["Usuário edita configuração na UI compartilhada"] --> Support{"Cliente ativo permite gravar e confirmar?"}
+    Support -->|"Não"| Explain["Desabilitar aplicação e explicar limitação"]
+    Support -->|"Sim"| Apply["DeviceClient.applyDeviceConfig"]
+    Apply --> Mode{"Ambiente selecionado"}
+    Mode -->|"Desktop"| Native["IPC e núcleo Rust validam e executam"]
+    Mode -->|"Browser"| Web["Protocolo web valida e executa via WebHID"]
+    Native --> Readback["Conferir estado por leitura"]
+    Web --> Readback
+    Readback --> Result{"Resultado confirmado?"}
+    Result -->|"Sim"| Done["Atualizar snapshot observado"]
+    Result -->|"Não"| Unknown["Exibir falha ou estado incerto e oferecer nova leitura"]
+```
+
+Filas e revisões protegem apenas as operações controladas pelo mesmo cliente. No browser, múltiplas abas e outros configuradores podem concorrer com a página; reler antes e depois da escrita e recusar operações conflitantes conhecidas. Não prometer exclusão global do hardware nem usar revisão local como prova de que nenhum outro programa alterou o dispositivo.
 
 ## 5. Janela minimizada, oculta e aplicativo encerrado
+
+**Esta seção descreve o aplicativo desktop.** No site, fechar a aba encerra o acesso; minimizar ou colocar a aba em segundo plano não garante monitoramento contínuo. Instalar a página como PWA não fornece as capacidades nativas que faltam ao WebHID.
 
 Esses estados têm comportamentos diferentes. O gerenciamento da janela e da bandeja ficará no lado nativo do Tauri, para não depender do ciclo de vida do React.
 
@@ -120,7 +172,7 @@ A opção **Iniciar com minha sessão** configura a inicialização automática 
 
 ## 6. Notificações: papel do React
 
-Com a janela em foco, o front pode mostrar avisos como “DPI alterado para 1200” ou “Bateria do mouse em 20%”, conforme a política fornecida pelo núcleo. A lista e o painel também são atualizados.
+No desktop, com a janela em foco, o front pode mostrar avisos como “DPI alterado para 1200” ou “Bateria do mouse em 20%”, conforme a política fornecida pelo núcleo. A lista e o painel também são atualizados.
 
 Com a janela minimizada, oculta, sem foco ou sem WebView, o núcleo decide e solicita a notificação nativa. O React **não precisa ficar aguardando em execução** para que essa notificação exista e não deve emitir outra notificação nativa para o mesmo evento.
 
@@ -130,12 +182,16 @@ Permissão de notificação e foco são informações do sistema gerenciadas pel
 
 Ao abrir novamente, mostrar o snapshot atual, não reproduzir automaticamente todos os avisos antigos como novos toasts. Um clique em uma notificação, quando suportado pelo sistema, poderá abrir o dispositivo correspondente.
 
+No modo web, avisos internos são emitidos pelo estado observado na página. Notificações do navegador podem ser avaliadas separadamente, com permissão, mas não representam um serviço residente nem garantem alertas após fechar o site. Preferências ficam no armazenamento do navegador por origem/perfil e não sincronizam automaticamente entre computadores. Pedidos de permissão HID e de notificação são independentes.
+
 ## 7. Plano de desenvolvimento e validação
 
-1. Criar o cliente IPC e adaptar os componentes atuais para snapshots e capacidades.
-2. Integrar listeners, sincronização inicial, estados antigos e erros de conexão.
-3. Implementar lista de dispositivos e painel, mantendo edições separadas do estado real.
-4. Integrar janela, bandeja e preferências de notificações ao núcleo.
-5. Disponibilizar gravações somente depois de validação do protocolo e da recuperação.
+1. Definir `DeviceClient`, snapshots, eventos, capacidades e resultados de escrita; adaptar a UI para receber o cliente sem importar APIs de plataforma.
+2. Manter a ponte Python explicitamente identificada como transporte de diagnóstico da PoC durante a migração, sem tratá-la como modo web sem instalação.
+3. Implementar o cliente desktop IPC quando o núcleo Rust estiver disponível e validar sincronização e reconexões.
+4. Investigar uma rota de leitura compatível com WebHID para o MT760; implementar o cliente browser apenas para operações comprovadas. Bloquear recursos não suportados com motivo visível.
+5. Integrar bandeja, janela e notificações no desktop. Habilitar escrita por recurso somente após validar confirmação, recuperação e persistência quando anunciada.
 
-Validar janela aberta, minimizada, oculta e recriada; ausência de listeners duplicados; eventos de sessão antiga; mudanças feitas no mouse; bateria baixa sem alertas repetidos; falhas de gravação e permissão negada. Testar também notificações no aplicativo instalado, especialmente no Windows. A interface poderá ser compartilhada entre plataformas, mas o comportamento de bandeja, permissões e notificações precisa de teste em cada sistema.
+Validar o contrato com clientes de teste: os mesmos componentes devem apresentar snapshots, capacidades e erros dos dois ambientes. Testar assinatura antes do snapshot, descarte de listeners, sessões antigas, revisão de configuração, capacidade indisponível e resultado de escrita incerto.
+
+No desktop, validar janela aberta, minimizada, oculta e recriada; mudanças físicas, bateria sem alertas repetidos e notificações no aplicativo instalado. No browser, validar ausência de WebHID, permissão negada/revogada, seleção por gesto do usuário, desconexão, segunda aba, retorno à página e interrupção de uma operação sem repetição automática. Testes com hardware determinam quais operações cada combinação de modelo, firmware, navegador e sistema suporta. Não anunciar “qualquer máquina” como compatibilidade garantida.

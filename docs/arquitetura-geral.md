@@ -2,7 +2,7 @@
 
 **Status: proposta de arquitetura, ainda não implementada. Atualizado em 2026-10-17.**
 
-O KMH será um aplicativo desktop para acompanhar e configurar periféricos compatíveis no Linux, macOS e Windows. Terá dois blocos: **front em React/TypeScript** e **núcleo em Rust**, integrados pelo Tauri 2.
+O KMH será um aplicativo desktop para acompanhar e configurar periféricos compatíveis no Linux, macOS e Windows. Terá dois blocos no desktop: **front em React/TypeScript** e **núcleo em Rust**, integrados pelo Tauri 2. O mesmo front também poderá ser publicado como site, usando um cliente WebHID para dispositivos com protocolo compatível e sem exigir o núcleo instalado.
 
 A interface atual e os experimentos Python são a base de pesquisa. Já validamos no Linux a leitura de bateria, DPI e polling rate do MT760 e uma alteração de tabela DPI que persistiu após ciclo de energia, seguida de restauração. Isso não significa que o núcleo Rust ou o suporte às outras plataformas já existam. A [arquitetura da PoC](architecture.md) descreve o estado atual; o [experimento de escrita](../research/experiments/write-dpi.md) contém a evidência física.
 
@@ -35,7 +35,7 @@ Os dois blocos são partes do mesmo aplicativo instalado. As WebViews apresentam
 | Edita preferências e apresenta perfis | Persiste preferências, perfis, backups e resultados |
 | Recebe eventos para atualizar a tela | Detecta mudanças e pode emitir notificações nativas sem a janela |
 
-O front não acessa HID diretamente nem envia bytes, endereços de memória ou comandos arbitrários. O núcleo não depende dos componentes React para continuar monitorando.
+Os componentes React não acessam HID diretamente nem enviam bytes, endereços de memória ou comandos arbitrários. Eles usam o contrato `DeviceClient`: no desktop, o cliente encaminha intenções ao núcleo por IPC; no site, uma implementação própria coordena protocolos compatíveis via WebHID. O núcleo não depende dos componentes React para continuar monitorando.
 
 ## 3. Comunicação entre front e núcleo
 
@@ -45,7 +45,7 @@ Usaremos o **IPC do Tauri**, sem servidor HTTP no caminho normal do aplicativo i
 - **Eventos:** núcleo informa conexão, mudança de estado ou resultado de operação. Exemplos: `device_state_changed`, `dpi_changed`, `battery_low`, `configuration_applied`, `operation_failed`.
 - **Snapshot:** uma fotografia completa do estado conhecido, suas capacidades e quando os campos foram lidos. A interface solicita snapshots ao abrir ou se precisar se sincronizar novamente.
 
-Esses nomes são o contrato proposto, não uma API já disponível. Os tipos devem ser definidos a partir do contrato Rust e refletidos em TypeScript, mantendo uma única referência para os formatos.
+Esses nomes são o contrato IPC proposto, não uma API já disponível. O contrato comum `DeviceClient` terá tipos independentes de plataforma, como `applyDeviceConfig`, traduzidos pelo cliente desktop para os comandos Rust. Os formatos IPC devem corresponder a esses tipos, por geração de bindings ou verificação de compatibilidade. O cliente browser entrega o mesmo formato de estado e declara suas próprias capacidades.
 
 ### Fluxo entre os blocos
 
@@ -87,10 +87,38 @@ Teclados e headsets serão adicionados por implementações específicas de prot
 1. Portar as consultas e o experimento de configuração do MT760 para o transporte Rust, comparando bytes e resultados com as capturas existentes.
 2. Resolver respostas atrasadas, reconexões e repouso antes de habilitar consultas contínuas.
 3. Integrar o núcleo ao Tauri, com bandeja, IPC e preferências locais.
-4. Reaproveitar o front React e trocar o cliente da ponte por um cliente IPC.
+4. Reaproveitar o front React por meio do contrato `DeviceClient`, com cliente IPC no desktop e cliente WebHID para operações web comprovadas; manter a ponte como diagnóstico durante a transição.
 5. Validar cada operação em hardware real no Linux, Windows e macOS. Botões e gravação de polling rate ainda exigem pesquisa própria.
 
 A ponte Python permanece uma ferramenta de diagnóstico durante a migração. Inicialmente, não é necessário um serviço de sistema separado; o núcleo independente da UI permite avaliar essa divisão no futuro.
+
+## 8. Interface compartilhada entre desktop e navegador
+
+```mermaid
+flowchart TB
+    UI["Front React compartilhado"] --> Contract["Contrato DeviceClient"]
+    Contract --> Desktop["Cliente desktop"]
+    Desktop --> IPC["IPC Tauri"]
+    IPC --> Rust["Núcleo Rust residente"]
+    Rust --> Native["HID ou API nativa"]
+    Contract --> Browser["Cliente browser"]
+    Browser --> Protocol["Protocolo compatível com a web"]
+    Protocol --> HID["WebHID com autorização"]
+    Native --> Device["Periférico compatível"]
+    HID --> Device
+```
+
+| Recurso | Desktop | Navegador sem núcleo |
+| --- | --- | --- |
+| Interface, edição e apresentação | React compartilhado | React compartilhado |
+| Leitura e configuração | Núcleo, conforme suporte do modelo | Cliente WebHID, conforme protocolo, browser e permissões |
+| Gravação persistente | Somente operações validadas | Somente se o protocolo permitir escrita e confirmação pela API web |
+| Monitoramento com janela fechada | Núcleo residente | Sem garantia após fechar ou suspender a página |
+| Bandeja e integração do sistema | Tauri e núcleo | Indisponíveis pelo contrato inicial do site |
+
+O suporte é declarado por operação e ambiente. O front não presume que uma operação disponível no desktop funciona no browser. Não há fallback automático para outro transporte durante falhas ou gravações. No site, a permissão depende do usuário e das regras do navegador e sistema; a API não garante acesso em qualquer máquina. [WebHID](https://developer.chrome.com/docs/capabilities/hid).
+
+Para o MT760, o teste WebHID enviou uma consulta, mas a leitura comprovada depende de `GET_REPORT(Input)` nativo, sem equivalente direto nessa API web. O cliente browser não deve anunciar suporte a essa leitura ou à gravação verificada até descobrir e validar outro caminho. Esta é uma preparação arquitetural, não a implementação da comunicação direta pelo site. Detalhes de contratos, capacidades e ciclo de vida estão na [arquitetura do front](arquitetura-front.md).
 
 ## Documentos complementares
 

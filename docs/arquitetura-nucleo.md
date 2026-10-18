@@ -4,6 +4,12 @@
 
 O núcleo será responsável pelo hardware, pelo estado dos periféricos e pela integração com o sistema operacional. Deverá continuar funcionando com a janela oculta. A [arquitetura geral](arquitetura-geral.md) define os dois blocos e os identificadores comuns; a [arquitetura do front](arquitetura-front.md) descreve quem consome seus eventos.
 
+## Relação com o front compartilhado
+
+O núcleo é o backend do **aplicativo desktop**. O front acessa seus comandos por um cliente `DeviceClient` que traduz as operações para IPC. O contrato de snapshots, capacidades e resultados deve ser compatível com os tipos compartilhados da UI, sem expor bytes HID aos componentes.
+
+O modo **site sem instalação** usa outra implementação desse contrato, baseada em WebHID e protocolos compatíveis. Ele não chama o núcleo Rust e não herda monitoramento residente, notificações nativas, permissões ou operações disponíveis somente pelas APIs do sistema. O núcleo também não será exposto a sites por uma API HTTP nesta proposta. Suporte no desktop não implica suporte no browser; cada cliente informa suas capacidades por operação. Consulte a [arquitetura do front](arquitetura-front.md).
+
 ## 1. Hierarquia interna
 
 ```mermaid

@@ -12,13 +12,13 @@ Repositório: [gdsantana/kmh-project](https://github.com/gdsantana/kmh-project).
 
 **Para continuar em outra sessão:** leia o [registro de retomada de bateria e DPI](docs/retomada-dpi-bateria.md), com o processo de descoberta, execução, arquivos relevantes, evidências e pendências.
 
-## Arquitetura desktop proposta
+## Arquitetura proposta: desktop e navegador
 
-A evolução planejada usa front React/TypeScript e núcleo Rust residente, integrados pelo Tauri 2. O núcleo monitorará os dispositivos e emitirá notificações mesmo com a janela oculta. A implementação atual continua sendo a PoC descrita abaixo.
+A evolução planejada usa front React/TypeScript e núcleo Rust residente, integrados pelo Tauri 2. O núcleo monitorará os dispositivos e emitirá notificações mesmo com a janela oculta. O front terá um contrato de comunicação compartilhado, com cliente IPC no desktop e cliente WebHID para operações compatíveis no navegador, sem núcleo instalado. A comunicação direta do site com o MT760 ainda depende de pesquisa e validação. A implementação atual continua sendo a PoC descrita abaixo.
 
 - [Arquitetura geral](docs/arquitetura-geral.md): os dois blocos, responsabilidades e comunicação.
 - [Arquitetura do núcleo](docs/arquitetura-nucleo.md): sistema operacional, identificação e monitoramento de periféricos, consultas, configurações e notificações.
-- [Arquitetura do front](docs/arquitetura-front.md): interface, eventos, sincronização e funcionamento minimizado ou na bandeja.
+- [Arquitetura do front](docs/arquitetura-front.md): interface compartilhada, clientes IPC/WebHID, capacidades, sincronização e funcionamento em segundo plano.
 
 Os três documentos incluem diagramas de hierarquia e de fluxo em Mermaid.
 
